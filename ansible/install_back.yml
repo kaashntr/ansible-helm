@@ -1,0 +1,33 @@
+  - name: Install backend
+    kubernetes.core.helm:
+      name: back
+      chart_ref: ./helm-backend/backend-chart
+      release_namespace: default
+      force: True
+      disable_hook: True
+      kubeconfig: /etc/rancher/k3s/k3s.yaml
+      values: 
+        replicaCount: 1
+        image:
+          repository: changeme
+          tag: latest
+          pullPolicy: IfNotPresent
+        service:
+          type: ClusterIP
+          port: changeme
+        env:
+          DB_ENDPOINT: changeme
+          DATABASE: changeme
+          USERNAME: changeme
+          USERPASSWORD: changeme
+          CACHE_ENDPOINT: changeme
+        ingress:
+          enabled: true
+          host: changeme
+          path: /
+          pathType: Prefix
+          entryPoint: websecure
+          tls:
+            enabled: true
+            secretName: tls-secret
+      release_state: "{{ helm_release_state }}"
