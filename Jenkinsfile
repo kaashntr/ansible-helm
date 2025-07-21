@@ -24,8 +24,8 @@ pipeline {
                 ]){
                     dir ('gcp-terraform'){
                         sh '''
-                            chmod +x tf
-                            ./tf apply -var-file=$SECRET_TFVARS_PATH -auto-approve
+                            export GOOGLE_APPLICATION_CREDENTIALS=$SECRET_PATH
+                            terraform apply -var-file=$SECRET_TFVARS_PATH -auto-approve
                         '''
                     }
                 }
