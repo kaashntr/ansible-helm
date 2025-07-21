@@ -25,6 +25,7 @@ pipeline {
                     dir ('gcp-terraform'){
                         sh '''
                             export GOOGLE_APPLICATION_CREDENTIALS=$SECRET_PATH
+                            terraform init
                             terraform apply -var-file="$SECRET_TFVARS_PATH" -auto-approve
                         '''
                     }
