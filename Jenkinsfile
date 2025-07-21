@@ -23,7 +23,10 @@ pipeline {
                     file(credentialsId: 'tfvars', variable: 'SECRET_TFVARS_PATH'),
                 ]){
                     dir ('gcp-terraform'){
-                        sh 'sh tf apply --auto-approve -var-file=$SECRET_TFVARS_PATH'
+                        sh '''
+                            chmod +x tf
+                            ./tf apply --auto-approve -var-file=$SECRET_TFVARS_PATH
+                        '''
                     }
                 }
             }
