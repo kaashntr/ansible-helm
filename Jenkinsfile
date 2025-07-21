@@ -41,7 +41,7 @@ pipeline {
                         ansiblePlaybook(
                             playbook: 'install_front.yml',
                             inventory: 'inventory.ini',
-                            colorized: true
+                            colorized: true,
                             extraVars: [
                                 image_repository: params.IMAGE_REPO,
                                 image_tag: params.IMAGE_TAG,
