@@ -16,7 +16,7 @@ pipeline {
 
                 ]){
                     dir ('gcp-terraform'){
-                        sh './tf apply --auto-approve -var-file=$SECRET_TFVARS_PATH'
+                        sh 'sh tf apply --auto-approve -var-file=$SECRET_TFVARS_PATH'
                     }
                 }
             }
