@@ -1,3 +1,6 @@
+- name: Install K3s server
+  hosts: servers
+  tasks:
   - name: Install fronend
     kubernetes.core.helm:
       name: front
@@ -9,14 +12,14 @@
       values: 
         replicaCount: 1
         image:
-          repository: changeme
-          tag: latest
+          repository: "{{ image_repository }}"
+          tag: "{{ image_tag }}"
           pullPolicy: IfNotPresent
         service:
           type: ClusterIP
-          port: changeme
+          port: "{{ service_port }}"
         env:
-          BACKEND_URL: changeme
+          BACKEND_URL: '{{ BACKEND_URL }}'
         ingress:
           enabled: true
           host: app.class-schedule.pp.ua
