@@ -48,6 +48,15 @@ pipeline {
                                 inventory: 'inventory.ini',
                                 colorized: true,
                                 extraVars: [
+                                    helm_release_state: "absent"
+
+                                ]
+                            )
+                            ansiblePlaybook(
+                                playbook: 'install_back.yml',
+                                inventory: 'inventory.ini',
+                                colorized: true,
+                                extraVars: [
                                     image_repository: params.IMAGE_REPO,
                                     image_tag: params.IMAGE_TAG,
                                     service_port: params.SERVICE_PORT,
