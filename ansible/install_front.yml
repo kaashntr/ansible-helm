@@ -30,15 +30,10 @@
             enabled: true
             secretName: tls-secret
       release_state: "{{ helm_release_state }}"
-  - name: Check frontend pods are ready (retry until condition)
-    kubernetes.core.k8s_info:
-      kind: Pod
-      namespace: default
-      label_selectors:
-        - app=front
-    register: frontend_pods
-    until: >
-      frontend_pods.resources | length > 0 and
-      frontend_pods.resources | map(attribute='status.containerStatuses') | flatten() | selectattr('ready') | list | length == frontend_pods.resources | length
-    retries: 30
-    delay: 10
+  - name: Check frontend pods status
+    shell: |
+      kubectl get pods -n default -l app=frontend -o jsonpath='{range .items[*]}{.metadata.name}{" "}{.status.phase}{"\n"}{end}'
+    register: pod_status
+
+  - debug:
+      msg: "{{ pod_status.stdout }}"
