@@ -1,3 +1,6 @@
+- name: Install K3s server
+  hosts: servers
+  tasks:
   - name: Install backend
     kubernetes.core.helm:
       name: back
@@ -6,24 +9,24 @@
       force: True
       disable_hook: True
       kubeconfig: /etc/rancher/k3s/k3s.yaml
-      values: 
+      values:
         replicaCount: 1
         image:
-          repository: changeme
-          tag: latest
+          repository: "{{ image_repository }}"
+          tag: "{{ image_tag }}"
           pullPolicy: IfNotPresent
         service:
           type: ClusterIP
-          port: changeme
+          port: "{{ service_port }}"
         env:
-          DB_ENDPOINT: changeme
-          DATABASE: changeme
-          USERNAME: changeme
-          USERPASSWORD: changeme
-          CACHE_ENDPOINT: changeme
+          DB_ENDPOINT: "{{ db_endpoint }}"
+          DATABASE: "{{ database }}"
+          USERNAME: "{{ username }}"
+          USERPASSWORD: "{{ userpassword }}"
+          CACHE_ENDPOINT: "{{ cache_endpoint }}"
         ingress:
           enabled: true
-          host: changeme
+          host: back.class-schedule.pp.ua
           path: /
           pathType: Prefix
           entryPoint: websecure
@@ -31,3 +34,11 @@
             enabled: true
             secretName: tls-secret
       release_state: "{{ helm_release_state }}"
+  - name: Check backend pods status
+    shell: |
+      kubectl get pods -n default -l app=backend -o jsonpath='{range .items[*]}{.metadata.name}{" "}{.status.phase}{"\n"}{end}'
+    register: pod_status
+
+  - debug:
+      msg: "{{ pod_status.stdout }}"
+  

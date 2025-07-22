@@ -1,0 +1,69 @@
+pipeline {
+    agent any
+    parameters {
+        string(name: 'IMAGE_REPO', defaultValue: 'kaashntr/blood_is_fuel', description: 'Docker image repo')
+        string(name: 'IMAGE_TAG', defaultValue: 'latest', description: 'Docker image tag')
+        string(name: 'SERVICE_PORT', defaultValue: '3000', description: 'Service port to pod')
+        string(name: 'RELEASE_STATE', defaultValue: 'present', description: 'Release state can be present or absent')
+        string(name: 'DB_ENDPOINT', defaultValue: 'postgres', description: 'Database endpoint')
+        string(name: 'CACHE_ENDPOINT', defaultValue: 'redis', description: 'Cache endpoint')
+    }
+    stages {
+        stage('Checkout CSM') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('Create .ini locally'){
+            steps {
+                script {
+                    if (fileExists('gcp-terraform/.git')) {
+                        dir('gcp-terraform') {
+                            sh 'git pull'
+                        }
+                    } else {
+                        sh 'git clone https://github.com/kaashntr/gcp-terraform.git'
+                    }
+                }
+                withCredentials([
+                    file(credentialsId: 'gcp-sa-credentials', variable: 'SECRET_PATH'),
+                    file(credentialsId: 'tfvars', variable: 'SECRET_TFVARS_PATH'),
+                ]){
+                    dir ('gcp-terraform'){
+                        sh '''
+                            export GOOGLE_APPLICATION_CREDENTIALS=$SECRET_PATH
+                            terraform init
+                            terraform apply -var-file="$SECRET_TFVARS_PATH" -auto-approve
+                        '''
+                    }
+                }
+                script {
+                    dir('ansible'){
+                        withCredentials([
+                            usernamePassword(credentialsId: 'postgres-creds', usernameVariable: 'DB_USER', passwordVariable: 'DB_PASSWORD')
+                            string(credentialsId: 'postgres-db-name', variable: 'DATABASE'),
+                        ]){
+                            ansiblePlaybook(
+                                playbook: 'install_back.yml',
+                                inventory: 'inventory.ini',
+                                colorized: true,
+                                extraVars: [
+                                    image_repository: params.IMAGE_REPO,
+                                    image_tag: params.IMAGE_TAG,
+                                    service_port: params.SERVICE_PORT,
+                                    db_endpoint: params.DB_ENDPOINT,
+                                    database: "${env.DATABASE}",
+                                    username: "${env.DB_USER}",
+                                    userpassword: "${env.DB_PASSWORD}",
+                                    cache_endpoint: params.CACHE_ENDPOINT,
+                                    helm_release_state: params.RELEASE_STATE
+    
+                                ]
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
