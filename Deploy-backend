@@ -48,6 +48,14 @@ pipeline {
                                 inventory: 'inventory.ini',
                                 colorized: true,
                                 extraVars: [
+                                    image_repository: params.IMAGE_REPO,
+                                    image_tag: params.IMAGE_TAG,
+                                    service_port: params.SERVICE_PORT,
+                                    db_endpoint: params.DB_ENDPOINT,
+                                    database: "${env.DATABASE}",
+                                    username: "${env.DB_USER}",
+                                    userpassword: "${env.DB_PASSWORD}",
+                                    cache_endpoint: params.CACHE_ENDPOINT,
                                     helm_release_state: "absent"
 
                                 ]
