@@ -1,7 +1,7 @@
 pipeline {
     agent any
     parameters {
-        string(name: 'IMAGE_REPO', defaultValue: 'kaashntr/blood_is_fuel', description: 'Docker image repo')
+        string(name: 'IMAGE_REPO', defaultValue: 'kaashntr/hell_is_full', description: 'Docker image repo')
         string(name: 'IMAGE_TAG', defaultValue: 'latest', description: 'Docker image tag')
         string(name: 'SERVICE_PORT', defaultValue: '3000', description: 'Service port to pod')
         string(name: 'RELEASE_STATE', defaultValue: 'present', description: 'Release state can be present or absent')
