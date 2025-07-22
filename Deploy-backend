@@ -40,8 +40,8 @@ pipeline {
                 script {
                     dir('ansible'){
                         withCredentials([
-                            usernamePassword(credentialsId: 'postgres-creds', usernameVariable: 'DB_USER', passwordVariable: 'DB_PASSWORD')
-                            string(credentialsId: 'postgres-db-name', variable: 'DATABASE'),
+                            usernamePassword(credentialsId: 'postgres-creds', usernameVariable: 'DB_USER', passwordVariable: 'DB_PASSWORD'),
+                            string(credentialsId: 'postgres-db-name', variable: 'DATABASE')
                         ]){
                             ansiblePlaybook(
                                 playbook: 'install_back.yml',
@@ -57,7 +57,7 @@ pipeline {
                                     userpassword: "${env.DB_PASSWORD}",
                                     cache_endpoint: params.CACHE_ENDPOINT,
                                     helm_release_state: params.RELEASE_STATE
-    
+
                                 ]
                             )
                         }
