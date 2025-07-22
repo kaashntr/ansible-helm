@@ -47,6 +47,18 @@ pipeline {
                                 image_tag: params.IMAGE_TAG,
                                 service_port: params.SERVICE_PORT,
                                 BACKEND_URL: params.BACKEND_URL,
+                                helm_release_state: "absent"
+                            ]
+                        )
+                        ansiblePlaybook(
+                            playbook: 'install_front.yml',
+                            inventory: 'inventory.ini',
+                            colorized: true,
+                            extraVars: [
+                                image_repository: params.IMAGE_REPO,
+                                image_tag: params.IMAGE_TAG,
+                                service_port: params.SERVICE_PORT,
+                                BACKEND_URL: params.BACKEND_URL,
                                 helm_release_state: params.RELEASE_STATE
                             ]
                         )
